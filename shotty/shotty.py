@@ -22,13 +22,18 @@ def list_instances(project):
         instances = ec2.instances.all()
 
     for i in instances:  #ec2.instances is a collection
+        if i.public_dns_name:
+            dns=i.public_dns_name + " --public"
+        else:
+            dns= i.private_dns_name + " --private"
         print(', '.join( (i.id,
                           i.instance_type,
                           i.placement['AvailabilityZone'],
                           i.state['Name'],
-                          i.public_dns_name))
+                          dns))
              )
     return
 
 if __name__ == '__main__':
     list_instances()
+
