@@ -12,4 +12,16 @@ shotty uses the configuration file created by the AWS CLI. Example, 'personal' p
 `aws configure --profile personal`
 
 ## Running
-python shotty/shotty.py
+python shotty/shotty.py <command> < --project=<name of project> >
+*command* is list, start, or stop
+*project* is optional
+
+Example:
+python shotty/shotty.py list --project=Valkyrie
+python shotty/shotty.py start --project=Valkyrie
+python shotty/shotty.py stop --project=Valkyrie
+
+## Help
+Each command has its own help
+Example:
+python shotty/python.py list --help
