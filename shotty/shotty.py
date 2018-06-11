@@ -1,6 +1,6 @@
-#import os
-#os.environ['HTTP_PROXY']="http://nibr-proxy.global.nibr.novartis.net:2011"
-#os.environ['HTTPS_PROXY']="http://nibr-proxy.global.nibr.novartis.net:2011"
+import os
+os.environ['HTTP_PROXY']="http://nibr-proxy.global.nibr.novartis.net:2011"
+os.environ['HTTPS_PROXY']="http://nibr-proxy.global.nibr.novartis.net:2011"
 
 import boto3
 import click
@@ -81,10 +81,19 @@ def create_snapshots(project):
     "Create snapshots for EC2 instances"
     instances = filter_instances(project)
     for i in instances:
+        print("Stopping {0}...".format(i.id))
         i.stop()
+        i.wait_until_stopped()
+        
         for v in i.volumes.all():
             print("Creating snapshot of {0}".format(v.id))
             v.create_snapshot(Description="Created by snapshot analyzer")
+        
+        print("Starting {0}...".format(i.id))
+        i.start()
+        i.wait_until_running()
+    
+    print("Job's done!")
     return
 #------------------------------------------------------------------------------
 
