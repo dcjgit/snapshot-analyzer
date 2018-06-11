@@ -26,6 +26,7 @@ def filter_instances(project):
 #@ is a decorator (wrapper) for our functions
 #define a group to contain other groups. One main group cli
 #and inside it we have other groups
+
 @click.group()
 def cli():
     """Shotty manages snapshots"""
@@ -49,7 +50,8 @@ def list_volumes(project):
                                  s.start_time.strftime("%c")))
                      )
     return
-
+#-----------------------------------------------------------------------------
+    
 
 @cli.group('volumes')    #this is group in cli group (nested)
 def volumes():
@@ -72,6 +74,20 @@ def list_volumes(project):
 @cli.group()
 def instances():
     """Commands for instances"""
+
+@instances.command('snapshot', help="Create snapshots of all volumes")
+@click.option('--project', default=None, help="Only instances for project (tag Project:<name>)")
+def create_snapshots(project):
+    "Create snapshots for EC2 instances"
+    instances = filter_instances(project)
+    for i in instances:
+        i.stop()
+        for v in i.volumes.all():
+            print("Creating snapshot of {0}".format(v.id))
+            v.create_snapshot(Description="Created by snapshot analyzer")
+    return
+#------------------------------------------------------------------------------
+
 
 @instances.command('list')
 @click.option('--project', default=None, help="Only instances for project (tag Project:<name>)")
