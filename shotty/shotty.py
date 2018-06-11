@@ -1,6 +1,8 @@
+#Do this...
 import os
 os.environ['HTTP_PROXY']="http://nibr-proxy.global.nibr.novartis.net:2011"
 os.environ['HTTPS_PROXY']="http://nibr-proxy.global.nibr.novartis.net:2011"
+#..upto this if running in Corporate intranet.
 
 import boto3
 import botocore  #for error handling
