@@ -3,8 +3,8 @@ os.environ['HTTP_PROXY']="http://nibr-proxy.global.nibr.novartis.net:2011"
 os.environ['HTTPS_PROXY']="http://nibr-proxy.global.nibr.novartis.net:2011"
 
 import boto3
-import botocore
-import click
+import botocore  #for error handling
+import click     #for command line processing
 
 session = boto3.Session(profile_name='personal')
 ec2 = session.resource('ec2')
