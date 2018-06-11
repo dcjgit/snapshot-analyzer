@@ -22,6 +22,11 @@ def filter_instances(project):
         instances = ec2.instances.all()
 
     return instances
+
+def has_pending_snapshots(volume):
+    snapshots = list(volume.snapshots.all())
+    return snapshots and snapshots[0].state == 'pending'
+    
 #------------------------------------------------------------------
 
 #@ is a decorator (wrapper) for our functions
@@ -38,7 +43,10 @@ def snapshots():
 
 @snapshots.command('list')
 @click.option('--project', default=None, help='Only snapshots for project (tag Project:<name>)')
-def list_snapshots(project):
+@click.option('--all', 'list_all', default=False, is_flag=True,
+              help="List all snapshots for each volume, not just the most recent")
+
+def list_snapshots(project, list_all):
     "List EC2 snapshots"
     instances = filter_instances(project)
     for i in instances:
@@ -50,9 +58,12 @@ def list_snapshots(project):
                                  s.state, s.progress,
                                  s.start_time.strftime("%c")))
                      )
+                if s.state == 'completed' and not list_all:
+                    break
+                
     return
 #-----------------------------------------------------------------------------
-    
+
 
 @cli.group('volumes')    #this is group in cli group (nested)
 def volumes():
@@ -87,6 +98,10 @@ def create_snapshots(project):
         i.wait_until_stopped()
         
         for v in i.volumes.all():
+            if has_pending_snapshots(v):
+                print("Skipping {0}, snapshot already in progress".format(v.id))
+                continue
+            
             print("Creating snapshot of {0}".format(v.id))
             v.create_snapshot(Description="Created by snapshot analyzer")
         
